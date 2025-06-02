@@ -34,3 +34,9 @@ Be aware that exotic input values may lead to numerical instability. In that cas
 
 ## References
 - Analytical solutions of geohydrological problems. G.A. Bruggeman p. 66 (Formula 123.32).
+
+
+![](https://github.com/user-attachments/assets/0c7eccd0-f4ff-4239-b0d8-3a745fdfecc6)
+![](https://github.com/user-attachments/assets/b687a07b-01e5-477d-b17f-a26ced45e1e5)
+![](https://github.com/user-attachments/assets/67ece9cf-a6bf-4aa6-bfc1-b8e2f9a3eae1)
+![](https://github.com/user-attachments/assets/584857b3-f30b-45a2-b738-8a5229601524)
