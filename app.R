@@ -199,15 +199,15 @@ ui <- fluidPage(
           tabPanel("System definition",
                    sidebarLayout(
                          sidebarPanel(
-                               numericInput("h", "Drawdown of surf. water level h [L]:", 1),
-                               numericInput("kD", "Hydraulic conductivity kD [L2/T]:", value=250, min=0.001),
-                               numericInput("c", "Hydraulic resistance c [T]:", value=100, min=10),
-                               numericInput("S", "Storage coefficient S [-]:", value=0.15, min=0.00001, max=1),
+                               numericInput("h", "Drawdown of surf. water level h [L]:", -1),
+                               numericInput("kD", "Hydraulic conductivity kD [L2/T]:", value=2000, min=0.001),
+                               numericInput("c", "Hydraulic resistance c [T]:", value=2000, min=10),
+                               numericInput("S", "Storage coefficient S x 10-5 [-]:", value=0.5, min=0.1, max=100),
                                
                                bsTooltip("h", "value <> 0 [L]", "top", options = list(container = "body")),
                                bsTooltip("kD", "value > 0 [L2/T]", "top", options = list(container = "body")),
                                bsTooltip("c", "value > 10 [T]", "top", options = list(container = "body")),
-                               bsTooltip("S", "0.00001 < value <= 1", "top", options = list(container = "body")),
+                               bsTooltip("S x 10-5", "0.1 < value <= 100", "top", options = list(container = "body")),
                                
                                downloadButton("downloadData", "Download input data"), br(), br(),
                                
@@ -302,9 +302,9 @@ ui <- fluidPage(
                                      numericInput("sim_num_points_x", "Number of points in x-array:", value = 100, min = 1),
                                      numericInput("sim_min_x", "Minimum value of x:", value = 1, min = 0),
                                      numericInput("sim_max_x", "Maximum value of x:", value = 1000, min = 0),
-                                     numericInput("sim_num_points_t", "Number of points in t-array:", value = 5, min = 1, max = 10),
-                                     numericInput("sim_min_t", "Minimum value of t:", value = 1, min = 0.001),
-                                     numericInput("sim_max_t", "Maximum value of t:", value = 1000, min = 0),
+                                     numericInput("sim_num_points_t", "Number of points in t-array:", value = 7, min = 1, max = 10),
+                                     numericInput("sim_min_t", "Minimum value of t:", value = 7, min = 0.001),
+                                     numericInput("sim_max_t", "Maximum value of t:", value = 120, min = 0),
                                      
                                      bsTooltip("sim_num_points_x", "value >= 1", "top", options = list(container = "body")),
                                      bsTooltip("sim_num_points_t", "1 <= value <= 10", "top", options = list(container = "body")),
@@ -329,11 +329,11 @@ ui <- fluidPage(
                                      br(), br(),
                                      
                                      numericInput("sim_num_points_x_t", "Number of points in x-array:", value = 6, min = 1, max=10),
-                                     numericInput("sim_min_x_t", "Minimum value of x:", value = 0, min = 0),
+                                     numericInput("sim_min_x_t", "Minimum value of x:", value = 100, min = 0),
                                      numericInput("sim_max_x_t", "Maximum value of x:", value = 1000, min = 0),
                                      numericInput("sim_num_points_t_t", "Number of points in t-array:", value = 100, min = 1),
-                                     numericInput("sim_min_t_t", "Minimum value of t:", value = 1, min = 0.001),
-                                     numericInput("sim_max_t_t", "Maximum value of t:", value = 250, min = 0),
+                                     numericInput("sim_min_t_t", "Minimum value of t:", value = 10, min = 0.001),
+                                     numericInput("sim_max_t_t", "Maximum value of t:", value = 150, min = 0),
                                      
                                      bsTooltip("sim_num_points_x_t","1 <= value <= 10" , "top", options = list(container = "body")),
                                      bsTooltip("sim_num_points_t_t", "value >= 1", "top", options = list(container = "body")),
@@ -365,7 +365,7 @@ server <- function(input, output, session) {
       observeEvent(input$plot_button_x, {
             x_values <- seq(input$min_x, input$max_x, length.out = input$num_points_x)
             t_values <- round(pracma::logseq(input$min_t, input$max_t, input$num_points_t),1)
-            result_x(calc_stress_response(x = x_values, t = t_values, S = input$S, kD = input$kD, c = input$c, h = input$h))
+            result_x(calc_stress_response(x = x_values, t = t_values, S = input$S*10^-5, kD = input$kD, c = input$c, h = input$h))
             output$stressPlotS <- renderPlotly({
                   plot_stress_response_x_Phi(result_x(), title_text= paste("Sudden drawdown of the surface water level with h=", input$h, "[L]")) 
             })
@@ -378,7 +378,7 @@ server <- function(input, output, session) {
             x_values <- seq(input$min_x_t, input$max_x_t, length.out = input$num_points_x_t)
             t_values <- seq(input$min_t_t, input$max_t_t, length.out = input$num_points_t_t)
             
-            result_t(calc_stress_response(x = x_values, t = t_values, S = input$S, kD = input$kD, c = input$c, h = input$h))
+            result_t(calc_stress_response(x = x_values, t = t_values, S = input$S*10^-5, kD = input$kD, c = input$c, h = input$h))
             title_text <- paste("Sudden drawdown of the surface water level with h=", input$h, "[L]")
             output$stressPlotS_t <- renderPlotly({
                   plot_stress_response_t_Phi(result_t(), title_text= paste("Sudden drawdown of the surface water level with h=", input$h, "[L]"))
@@ -520,7 +520,7 @@ server <- function(input, output, session) {
             
             df <- df[, c("Time", "h")]
             df <- df[order(df$Time), ]
-            df <- df[c(TRUE, diff(df$h) != 0), ] # Remove duplicates
+            #df <- df[c(TRUE, diff(df$h) != 0), ] # Remove duplicates
             return(df)
       })
             
@@ -563,7 +563,7 @@ server <- function(input, output, session) {
             
             t_h <- stress_sequence()
             names(t_h) <- c("t", "h")
-            sim_result_x(simulate_stress_response(x = x_values, t = t_values, S = input$S, kD = input$kD, c = input$c, t_h = t_h ))
+            sim_result_x(simulate_stress_response(x = x_values, t = t_values, S = input$S*10^-5, kD = input$kD, c = input$c, t_h = t_h ))
             output$sim_stressPlotS <- renderPlotly({
                   plot_stress_response_x_Phi(sim_result_x())
             })
@@ -578,7 +578,7 @@ server <- function(input, output, session) {
             
             t_h <- stress_sequence()
             names(t_h) <- c("t", "h")
-            sim_result_t(simulate_stress_response(x = x_values, t = t_values, S = input$S, kD = input$kD, c = input$c, t_h = t_h))
+            sim_result_t(simulate_stress_response(x = x_values, t = t_values, S = input$S*10^-5, kD = input$kD, c = input$c, t_h = t_h))
             output$sim_stressPlotS_t <- renderPlotly({
                   plot_stress_response_t_Phi(sim_result_t(), t_a)
             })
