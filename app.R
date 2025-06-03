@@ -202,7 +202,7 @@ ui <- fluidPage(
                                numericInput("h", "Drawdown of surf. water level h [L]:", -1),
                                numericInput("kD", "Hydraulic conductivity kD [L2/T]:", value=2000, min=0.001),
                                numericInput("c", "Hydraulic resistance c [T]:", value=2000, min=10),
-                               numericInput("S", "Storage coefficient S x 10-5 [-]:", value=0.5, min=0.1, max=100),
+                               numericInput("S", "Storage coefficient S x 10-5 [-]:", value=0.5),
                                
                                bsTooltip("h", "value <> 0 [L]", "top", options = list(container = "body")),
                                bsTooltip("kD", "value > 0 [L2/T]", "top", options = list(container = "body")),
