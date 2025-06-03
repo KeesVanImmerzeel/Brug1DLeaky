@@ -13,6 +13,8 @@ spatially constant kD, c and S.
 
 The response to a sequence of stress values (h) may be studied (simulation option).
 
+![Formulas](https://github.com/user-attachments/assets/ae4afc5f-2d70-47a8-adbf-a62da07359bf)
+
 ![](https://github.com/user-attachments/assets/55fcbfc8-712c-45f3-866e-a395a62bd434)
 
 
